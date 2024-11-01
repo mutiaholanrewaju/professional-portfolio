@@ -1,2 +1,2 @@
-# professional-portfolio
-This is my portfolio website 
+# Deploying a Portfolio Website on Google Cloud Run with CI/CD
+In this project, I developed and deployed a portfolio website using Google Cloud Run, with a focus on creating a robust CI/CD pipeline. I utilized Docker to containerize the application, ensuring consistency across environments. Cloud Build was configured to automate the building and pushing of images, while GitHub Actions managed the CI/CD pipeline, automating testing and deployment. The result is a fully automated workflow where updates are seamlessly deployed to the cloud with every GitHub push, streamlining the deployment process and enhancing site reliability. 
