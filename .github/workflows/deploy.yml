@@ -1,43 +1,31 @@
-name: Deploy to Cloud Run
+name: CI/CD for Portfolio Site
 
 on:
   push:
     branches:
-      - main  # Trigger the workflow on pushes to the main branch
+      - main
 
 jobs:
-  build-deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the latest code
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
-      # Step 2: Set up Google Cloud SDK
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
+      - name: Authenticate with GCP
+        uses: google-github-actions/auth@v1
         with:
-          project_id: ${{ secrets.GCP_PROJECT }}  # Ensure this secret is set
-          service_account_key: ${{ secrets.GCP_CREDENTIALS }}  # Ensure this secret is set
-          export_default_credentials: true
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
-      # Step 3: Authenticate with Google Cloud using the Service Account
-      - name: Authenticate with Google Cloud
-        run: echo "${{ secrets.GCP_CREDENTIALS }}" | base64 --decode > $HOME/gcloud-key.json
-      - name: Set up gcloud credentials
-        run: gcloud auth activate-service-account --key-file $HOME/gcloud-key.json
-
-      # Configure Docker for Cloud Build
-      - name: Configure Docker
-        run: gcloud auth configure-docker
-
-      # Step 4: Build and Deploy to Cloud Run
-      - name: Build and Deploy
+      - name: Trigger Cloud Build
         run: |
-          gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT }}/portfolio-website
-          gcloud run deploy portfolio-website \
-            --image gcr.io/${{ secrets.GCP_PROJECT }}/portfolio-website \
+          gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT }}/portfolio-site:${{ github.sha }}
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy portfolio-site \
+            --image gcr.io/${{ secrets.GCP_PROJECT }}/portfolio-site:${{ github.sha }} \
             --platform managed \
-            --region us-central1 \  
+            --region us-central1 \
             --allow-unauthenticated
