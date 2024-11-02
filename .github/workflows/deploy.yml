@@ -22,7 +22,13 @@ jobs:
           service_account_key: ${{ secrets.GCP_CREDENTIALS }}  # Ensure this secret is set
           export_default_credentials: true
 
-      # Step 3: Configure Docker for Cloud Build
+      # Step 3: Authenticate with Google Cloud using the Service Account
+      - name: Authenticate with Google Cloud
+        run: echo "${{ secrets.GCP_SA_KEY }}" | base64 --decode > $HOME/gcloud-key.json
+      - name: Set up gcloud credentials
+        run: gcloud auth activate-service-account --key-file $HOME/gcloud-key.json
+
+      # Configure Docker for Cloud Build
       - name: Configure Docker
         run: gcloud auth configure-docker
 
