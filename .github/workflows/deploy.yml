@@ -18,20 +18,20 @@ jobs:
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
         with:
-          project_id: ${{ secrets.GCP_PROJECT }}  # Add your project ID as a GitHub secret
-          service_account_key: ${{ secrets.GCP_CREDENTIALS }}  # Add your service account JSON key as a GitHub secret
+          project_id: ${{ secrets.GCP_PROJECT }}  # Ensure this secret is set
+          service_account_key: ${{ secrets.GCP_CREDENTIALS }}  # Ensure this secret is set
           export_default_credentials: true
 
       # Step 3: Configure Docker for Cloud Build
       - name: Configure Docker
         run: gcloud auth configure-docker
 
-      # Step 4: Build and Submit to Cloud Build
+      # Step 4: Build and Deploy to Cloud Run
       - name: Build and Deploy
         run: |
           gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT }}/portfolio-website
           gcloud run deploy portfolio-website \
             --image gcr.io/${{ secrets.GCP_PROJECT }}/portfolio-website \
             --platform managed \
-            --region us-west1 \
+            --region us-central1 \  
             --allow-unauthenticated
