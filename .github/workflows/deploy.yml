@@ -1,31 +1,37 @@
-name: CI/CD for Portfolio Site
+name: Deploy to Cloud Run
 
 on:
   push:
     branches:
-      - main
+      - main  # Trigger the workflow on pushes to the main branch
 
 jobs:
-  build-and-deploy:
+  build-deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout the latest code
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Authenticate with GCP
-        uses: google-github-actions/auth@v1
+      # Step 2: Set up Google Cloud SDK
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
         with:
-          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+          project_id: ${{ secrets.GCP_PROJECT }}  # Add your project ID as a GitHub secret
+          service_account_key: ${{ secrets.GCP_CREDENTIALS }}  # Add your service account JSON key as a GitHub secret
+          export_default_credentials: true
 
-      - name: Trigger Cloud Build
-        run: |
-          gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT }}/portfolio-site:${{ github.sha }}
+      # Step 3: Configure Docker for Cloud Build
+      - name: Configure Docker
+        run: gcloud auth configure-docker
 
-      - name: Deploy to Cloud Run
+      # Step 4: Build and Submit to Cloud Build
+      - name: Build and Deploy
         run: |
-          gcloud run deploy portfolio-site \
-            --image gcr.io/${{ secrets.GCP_PROJECT }}/portfolio-site:${{ github.sha }} \
+          gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT }}/portfolio-website
+          gcloud run deploy portfolio-website \
+            --image gcr.io/${{ secrets.GCP_PROJECT }}/portfolio-website \
             --platform managed \
-            --region us-central1 \
-            --allow-unauthenticate
+            --region us-west1 \
+            --allow-unauthenticated
