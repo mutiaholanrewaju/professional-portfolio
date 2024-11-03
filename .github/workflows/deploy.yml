@@ -20,9 +20,9 @@ jobs:
 
       - name: Trigger Cloud Build
         run: |
-          gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT }}/portfolio-site:${{ github.sha }}
-          options: 
-            logging: CLOUD_LOGGING_ONLY
+          gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT }}/portfolio-site:${{ github.sha }} \
+          --gcs-log-dir gs://portfolio-web-github-action
+          
               
       - name: Deploy to Cloud Run
         run: |
