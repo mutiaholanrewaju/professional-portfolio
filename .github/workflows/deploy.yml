@@ -20,8 +20,7 @@ jobs:
 
       - name: Trigger Cloud Build
         run: |
-          gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT }}/portfolio-site:${{ github.sha }} --quiet \
-          --logging CLOUD_LOGGING_ONLY
+          gcloud builds submit --suppress-logs --tag gcr.io/${{ secrets.GCP_PROJECT }}/portfolio-site:${{ github.sha }} 
           
 
       - name: Deploy to Cloud Run
