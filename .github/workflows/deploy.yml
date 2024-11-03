@@ -21,6 +21,7 @@ jobs:
       - name: Trigger Cloud Build
         run: |
           gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT }}/portfolio-site:${{ github.sha }} \
+          --platform linux/amd64 \
           --gcs-log-dir gs://portfolio-web-github-action
           
               
